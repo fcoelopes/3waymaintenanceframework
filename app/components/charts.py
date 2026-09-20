@@ -73,8 +73,8 @@ def curvas_X_R_paradas(
 
 
 def gantt_paradas_classificadas(
-    paradas: list,
-    avaliacoes: list,
+    paradas: list,  # list[Parada]
+    avaliacoes: list,  # list[AvaliacaoParada]
 ) -> go.Figure:
     """
     Linha do tempo das paradas coloridas pelo tipo de decisão Bruss X·R.
@@ -104,7 +104,7 @@ def tornado_sensibilidade_threshold(
 
 
 def cronograma_integrado(
-    decisoes: list,
+    decisoes: list,  # list[DecisaoIntegrada]
     horizonte_T: float,
 ) -> go.Figure:
     """
