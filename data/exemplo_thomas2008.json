@@ -1,0 +1,43 @@
+{
+  "_documentation": {
+    "source": "Thomas, Levrat & Iung (2008). Maintenance decision making tool reaching a compromise between maintainability and reliability performances. IFAC World Congress, Seoul.",
+    "section": "Section 3.1 + Table 1",
+    "notes": "Durações extraídas da coluna 'Stoppage duration' da Tabela 1 do artigo. Instantes regulares de 30 em 30h (parada 1 em t=30h, ..., parada 20 em t=600h). Threshold de referência da Tabela 3 (combinado X·R) = 0.35."
+  },
+  "horizonte_T": 800,
+  "paradas": [
+    {"id": 1,  "inicio": 30,  "duracao": 3.8},
+    {"id": 2,  "inicio": 60,  "duracao": 3.0},
+    {"id": 3,  "inicio": 90,  "duracao": 3.7},
+    {"id": 4,  "inicio": 120, "duracao": 3.4},
+    {"id": 5,  "inicio": 150, "duracao": 3.8},
+    {"id": 6,  "inicio": 180, "duracao": 3.5},
+    {"id": 7,  "inicio": 210, "duracao": 3.7},
+    {"id": 8,  "inicio": 240, "duracao": 3.4},
+    {"id": 9,  "inicio": 270, "duracao": 3.3},
+    {"id": 10, "inicio": 300, "duracao": 3.2},
+    {"id": 11, "inicio": 330, "duracao": 3.3},
+    {"id": 12, "inicio": 360, "duracao": 3.7},
+    {"id": 13, "inicio": 390, "duracao": 3.3},
+    {"id": 14, "inicio": 420, "duracao": 3.5},
+    {"id": 15, "inicio": 450, "duracao": 3.2},
+    {"id": 16, "inicio": 480, "duracao": 3.4},
+    {"id": 17, "inicio": 510, "duracao": 3.4},
+    {"id": 18, "inicio": 540, "duracao": 3.9},
+    {"id": 19, "inicio": 570, "duracao": 3.9},
+    {"id": 20, "inicio": 600, "duracao": 3.6}
+  ],
+  "parametros_referencia": {
+    "weibull_beta": 1.5,
+    "weibull_eta": 600,
+    "weibull_gamma": 0,
+    "mttr": 5,
+    "sigma_t": 2.0,
+    "_obs_sigma_t": "Não usado quando tipo_mantenabilidade='exponencial' (modo de validação contra a Tabela 3 do artigo). Default ~ 0.4·MTTR (CV típico industrial) para uso em modo lognormal."
+  },
+  "thresholds_referencia": {
+    "tabela1_maintainability": 0.5,
+    "tabela2_reliability": 0.5,
+    "tabela3_combinado_XR": 0.35
+  }
+}

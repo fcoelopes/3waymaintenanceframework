@@ -1,0 +1,33 @@
+[project]
+name = "promethee-app"
+version = "0.1.0"
+description = "Framework de apoio à decisão em manutenção: PROMETHEE/FUCOM + Bruss X·R + Selective Maintenance estocástica"
+authors = [{name = "Edson F. Coelho Lopes"}]
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit>=1.30",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "plotly>=5.18",
+    "pydantic>=2.5",
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
