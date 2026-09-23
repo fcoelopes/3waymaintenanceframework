@@ -3,8 +3,11 @@ import streamlit as st
 
 from app.core.bruss_xr import aplicar_bruss_carteira
 
-st.title("6 · Bruss X·R — Quando intervir?")
-st.caption("Seleciona e ordena oportunidades de parada para cada ativo priorizado.")
+st.title("6 · Bruss X·RUL — Quando intervir?")
+st.caption(
+    "Seleciona e ordena oportunidades usando mantenabilidade × sobrevivência "
+    "residual condicional à idade atual do ativo."
+)
 
 agenda = st.session_state.get("agenda_planta")
 params = st.session_state.get("parametros_bruss")

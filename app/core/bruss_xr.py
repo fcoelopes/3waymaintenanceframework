@@ -1,14 +1,18 @@
-"""Bruss X·R para seleção temporal de oportunidades de manutenção.
+"""Bruss X·RUL para seleção temporal de oportunidades de manutenção.
 
 O estágio recebe a agenda de paradas e, para cada ativo, calcula
-p_i = M(d_i) * R(a_i). As odds r_i=p_i/(1-p_i) alimentam a regra de Bruss.
-A aplicação recursiva produz uma ordenação das oportunidades.
+
+    p_i = M(d_i) * S_RUL(t_i | idade_atual)
+
+em que S_RUL é a sobrevivência residual condicional Weibull. As odds
+r_i=p_i/(1-p_i) alimentam a regra de Bruss. A aplicação recursiva produz
+uma ordenação das oportunidades.
 """
 from __future__ import annotations
 
 import numpy as np
 
-from app.core.reliability import p_success_combined, maintainability, reliability_weibull
+from app.core.reliability import maintainability, p_success_combined, survival_rul_weibull
 from app.models import (
     AgendaParadasPlanta,
     AvaliacaoParada,
@@ -61,6 +65,7 @@ def aplicar_bruss_xr(
             mttr=parametros.mttr,
             sigma_t=parametros.sigma_t,
             tipo_mantenabilidade=tipo_mantenabilidade,  # type: ignore[arg-type]
+            idade_atual=parametros.idade_atual,
         )
         x = float(maintainability(
             p.duracao,
@@ -68,8 +73,9 @@ def aplicar_bruss_xr(
             parametros.sigma_t,
             tipo_mantenabilidade,  # type: ignore[arg-type]
         ))
-        r = float(reliability_weibull(
+        r = float(survival_rul_weibull(
             p.inicio,
+            parametros.idade_atual,
             parametros.weibull_beta,
             parametros.weibull_eta,
             parametros.weibull_gamma,

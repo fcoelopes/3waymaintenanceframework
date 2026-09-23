@@ -1,6 +1,8 @@
 import math
 
-from app.core.rbd import confiabilidade_rbd
+import pytest
+
+from app.core.rbd import confiabilidade_rbd, validar_referencias
 from app.models import NoRBD
 
 
@@ -27,3 +29,11 @@ def test_rbd_nested():
     )
     r = confiabilidade_rbd(topo, {"A": 0.9, "B": 0.8, "C": 0.7})
     assert math.isclose(r, 0.9 * (1 - 0.2 * 0.3))
+
+
+def test_validacao_pode_exigir_rbd_completo():
+    topo = C("A")
+    validar_referencias(topo, {"A", "B"})
+
+    with pytest.raises(ValueError, match="RBD incompleto"):
+        validar_referencias(topo, {"A", "B"}, exigir_todos=True)

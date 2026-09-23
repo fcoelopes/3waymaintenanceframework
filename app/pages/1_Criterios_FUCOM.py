@@ -1,10 +1,13 @@
 import pandas as pd
 import streamlit as st
 
-from app.core.fucom import calcular_pesos, consistencia_chi, status_consistencia
+from app.core.fucom import resolver_fucom, status_consistencia
 
 st.title("1 · Critérios e Pesos — FUCOM")
-st.caption("Camada 1/3: preferências do decisor para responder quais ativos merecem prioridade.")
+st.caption(
+    "Camada 1/3: preferências do decisor. Os pesos são obtidos pelo problema "
+    "de otimização FUCOM com minimização explícita da DFC (χ)."
+)
 
 DEFAULT = pd.DataFrame([
     {"posicao": 1, "nome": "Criticidade", "direcao": "max", "q": 0.5, "p": 2.0, "phi": 1.0},
@@ -15,6 +18,11 @@ DEFAULT = pd.DataFrame([
 
 if "criterios_fucom_df" not in st.session_state:
     st.session_state.criterios_fucom_df = DEFAULT
+
+st.info(
+    "φ=1 no primeiro critério. A partir do segundo, φ representa a razão de "
+    "prioridade entre o critério imediatamente anterior e o atual: w(k-1)/w(k)."
+)
 
 edited = st.data_editor(
     st.session_state.criterios_fucom_df,
@@ -34,19 +42,30 @@ try:
         raise ValueError("Informe pelo menos dois critérios")
     if df["nome"].duplicated().any():
         raise ValueError("Nomes de critérios devem ser únicos")
+    if df["posicao"].duplicated().any():
+        raise ValueError("Posições dos critérios devem ser únicas")
     if (df["p"] <= df["q"]).any():
         raise ValueError("Cada critério deve respeitar p > q")
+
     phis = df["phi"].astype(float).tolist()
     phis[0] = 1.0
-    pesos = calcular_pesos(phis)
-    chi = consistencia_chi(pesos, phis)
+    resultado = resolver_fucom(phis)
+    pesos = resultado.pesos
+    chi = resultado.chi
+
+    df["phi"] = phis
     df["peso"] = pesos
-    st.dataframe(df[["posicao", "nome", "direcao", "q", "p", "phi", "peso"]], hide_index=True, use_container_width=True)
+    st.dataframe(
+        df[["posicao", "nome", "direcao", "q", "p", "phi", "peso"]],
+        hide_index=True,
+        use_container_width=True,
+    )
     c1, c2 = st.columns(2)
-    c1.metric("χ de consistência", f"{chi:.4f}")
-    c2.metric("Status", status_consistencia(chi))
+    c1.metric("DFC (χ)", f"{chi:.6f}")
+    c2.metric("Consistência", status_consistencia(chi))
     st.session_state.criterios_config = df.to_dict("records")
     st.session_state.pesos_fucom = pesos.tolist()
-    st.success("Critérios e pesos prontos.")
+    st.session_state.fucom_chi = chi
+    st.success("FUCOM resolvido por otimização. Critérios e pesos prontos.")
 except Exception as exc:
     st.error(str(exc))
