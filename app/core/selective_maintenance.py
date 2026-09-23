@@ -66,7 +66,10 @@ class SelectiveMaintenanceProblem:
         self.componentes = {c.ativo_id: c for c in componentes}
         if len(self.componentes) != len(componentes):
             raise ValueError("ativo_id deve ser único")
-        validar_referencias(topologia, set(self.componentes))
+        # A camada operacional deve avaliar a consequência no sistema inteiro.
+        # Componentes fora da lista de candidatos permanecem com ação "none",
+        # mas continuam presentes no RBD e afetam R_sys.
+        validar_referencias(topologia, set(self.componentes), exigir_todos=True)
 
         self.topologia = topologia
         self.duracao_missao = float(duracao_missao)
