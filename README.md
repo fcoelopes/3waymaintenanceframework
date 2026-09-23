@@ -181,3 +181,58 @@ app/
 
 A formulação, os contratos entre camadas e as hipóteses do MVP estão detalhados em
 `docs/MATHEMATICAL_MODEL.md`.
+
+## Turnaround scheduling — MRCPSP + escopo condicional
+
+Além do RCPSP/CP-SAT determinístico, a página `10_Turnaround_MRCPSP.py`
+oferece uma camada experimental para cronogramas exportados do Microsoft Project
+em XML com **modos alternativos de execução e escopo descoberto durante a parada**.
+
+Fluxo:
+
+```text
+Microsoft Project XML
+        ↓
+tarefas + precedências + recursos
+        ↓
+escopo potencial (sidecar JSON)
+        ↓
+mandatory / optional / conditional
+        ↓
+eventos de inspeção + AND / OR / XOR
+        ↓
+MRCPSP (modos de execução)
+        ↓
+SSGS com restrições de recursos
+        ↓
+rescheduling do trabalho ainda não iniciado
+```
+
+O XML permanece como planejamento-base. As regras que o Microsoft Project não
+representa nativamente ficam no sidecar JSON, incluindo:
+
+- atividades opcionais;
+- atividades condicionais disparadas por eventos de inspeção;
+- múltiplos achados simultâneos;
+- grupos lógicos AND, OR e XOR;
+- modos alternativos de execução;
+- deadlines e ajustes de capacidade.
+
+Atividades já iniciadas ou concluídas são congeladas durante o rescheduling.
+Relações de precedência com atividades inativas deixam de restringir o
+cronograma ativo.
+
+Arquivos de demonstração:
+
+- `data/turnaround_conditional_model.xml`;
+- `data/turnaround_conditional_scope.json`.
+
+O solver MRCPSP atual combina seleção de modos com **SSGS heurístico**. Para
+espaços pequenos de modos, enumera combinações; para espaços maiores, usa
+multi-start + busca local. Portanto, esse resultado não deve ser interpretado
+como prova de ótimo global em instâncias grandes.
+
+A implementação MRCPSP está em `app/core/turnaround/`. Ela é mantida separada
+do motor RCPSP/CP-SAT para permitir comparação e evolução futura antes de uma
+eventual unificação.
+
