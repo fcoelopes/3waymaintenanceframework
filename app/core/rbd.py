@@ -9,8 +9,8 @@ from __future__ import annotations
 from app.models import NoRBD
 
 
-def validar_referencias(topologia: NoRBD, componentes_ids: set[str]) -> None:
-    """Valida se todos os blocos do RBD referenciam componentes existentes."""
+def componentes_rbd(topologia: NoRBD) -> list[str]:
+    """Lista os componentes referenciados pelo RBD na ordem de travessia."""
     refs: list[str] = []
 
     def walk(no: NoRBD) -> None:
@@ -22,8 +22,20 @@ def validar_referencias(topologia: NoRBD, componentes_ids: set[str]) -> None:
             walk(filho)
 
     walk(topologia)
+    return refs
 
-    faltantes = sorted(set(refs) - componentes_ids)
+
+def validar_referencias(
+    topologia: NoRBD,
+    componentes_ids: set[str],
+    *,
+    exigir_todos: bool = False,
+) -> None:
+    """Valida referências e, opcionalmente, exige o RBD completo do sistema."""
+    refs = componentes_rbd(topologia)
+    refs_set = set(refs)
+
+    faltantes = sorted(refs_set - componentes_ids)
     if faltantes:
         raise ValueError(f"RBD referencia componentes inexistentes: {faltantes}")
 
@@ -33,6 +45,14 @@ def validar_referencias(topologia: NoRBD, componentes_ids: set[str]) -> None:
             "Cada componente deve aparecer uma única vez no RBD desta versão: "
             f"{duplicados}"
         )
+
+    if exigir_todos:
+        ausentes_do_rbd = sorted(componentes_ids - refs_set)
+        if ausentes_do_rbd:
+            raise ValueError(
+                "RBD incompleto: componentes do sistema ausentes da topologia: "
+                f"{ausentes_do_rbd}"
+            )
 
 
 def confiabilidade_rbd(topologia: NoRBD, confiabilidades: dict[str, float]) -> float:
