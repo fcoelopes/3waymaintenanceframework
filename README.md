@@ -3,7 +3,7 @@
 Aplicação Streamlit para integrar três perguntas que normalmente ficam separadas:
 
 1. **Quais ativos?** — FUCOM + PROMETHEE II
-2. **Quando intervir?** — Bruss X·RULUL com sobrevivência Weibull condicional à idade e mantenabilidade
+2. **Quando intervir?** — Bruss X·RUL com sobrevivência Weibull condicional à idade e mantenabilidade
 3. **O que fazer?** — RBD + Selective Maintenance com tempos de intervenção estocásticos
 
 ## Arquitetura decisória
@@ -17,11 +17,11 @@ ativos priorizados
         ↓
 Agenda + idade atual + Weibull + MTTR/σT
         ↓
-Bruss X·R
+Bruss X·RUL
         ↓
 ativo × parada
         ↓
-RBD + ações + MTTR/σT por ação
+RBD completo + ações + MTTR/σT por ação
         ↓
 Selective Maintenance
         ↓
