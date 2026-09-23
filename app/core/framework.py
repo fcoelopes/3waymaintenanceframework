@@ -1,9 +1,12 @@
-"""Orquestração das três camadas do framework de apoio à decisão.
+"""Orquestração das três decisões do 3Way Maintenance Framework.
 
 A intenção é manter os motores independentes e conectar somente seus contratos:
 PROMETHEE -> prioridade do ativo;
-Bruss X·R -> oportunidade temporal;
+Bruss X·RUL -> oportunidade temporal;
 Selective Maintenance -> ação/portfólio dentro da janela.
+
+O RCPSP é uma camada operacional posterior (HOW): recebe o escopo selecionado
+e verifica/programa sua execução detalhada com recursos e precedências.
 """
 from __future__ import annotations
 
