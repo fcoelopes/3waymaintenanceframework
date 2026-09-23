@@ -61,7 +61,6 @@ class AtividadeRCPSP(BaseModel):
     latest_finish_h: float | None = Field(default=None, gt=0)
     ativo_id: str | None = None
     acao_origem: str | None = None
-    obrigatoria: bool = True
 
     @field_validator("predecessores")
     @classmethod
