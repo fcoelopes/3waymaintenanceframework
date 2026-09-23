@@ -55,3 +55,19 @@ O exemplo inclui:
 - duas frentes concorrentes que disputam recursos.
 
 Use o arquivo como referência para exportar cronogramas reais do Microsoft Project. Os modos alternativos do MRCPSP continuam sendo definidos na aplicação; o XML representa o planejamento-base.
+
+
+### \`turnaround_conditional_model.xml\` + \`turnaround_conditional_scope.json\`
+
+Cenário demonstrativo de **scope discovery** em uma parada de bomba P-101.
+
+O XML contém o escopo potencial completo. O JSON define quais tarefas são condicionais e quais eventos da inspeção as disparam:
+
+- \`bearing_damage\` → troca de rolamentos;
+- \`seal_damage\` → troca de selo;
+- \`shaft_damage\` → reparo de eixo + END pós-reparo;
+- \`impeller_damage\` → decisão XOR entre recuperar ou substituir o impelidor.
+
+O JSON também demonstra múltiplos modos MRCPSP para reparos, permitindo alterar as capacidades na interface e observar mudança de modo e makespan.
+
+As tarefas potenciais podem permanecer no Project como parte da rede de planejamento; quando o sidecar as marca como inativas, suas relações de precedência não restringem o cronograma executável.
