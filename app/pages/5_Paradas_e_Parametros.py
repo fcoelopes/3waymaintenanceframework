@@ -5,7 +5,10 @@ from app.components.data_io import carregar_caso_thomas2008
 from app.models import AgendaParadasPlanta, ConfigBruss, ParametrosAtivoBruss, Parada
 
 st.title("5 · Paradas e Parâmetros — Quando?")
-st.caption("Agenda da planta + confiabilidade Weibull + mantenabilidade MTTR/σT.")
+st.caption(
+    "Agenda da planta + idade atual + sobrevivência condicional da RUL Weibull "
+    "+ mantenabilidade MTTR/σT."
+)
 
 prom = st.session_state.get("resultado_promethee")
 if prom is None:
@@ -41,7 +44,8 @@ if "parametros_bruss_df" not in st.session_state:
     rows = []
     for aid in top_ids:
         rows.append({
-            "ativo_id": aid, "nome": nomes.get(aid, aid), "weibull_beta": 1.5,
+            "ativo_id": aid, "nome": nomes.get(aid, aid), "idade_atual": 0.0,
+            "weibull_beta": 1.5,
             "weibull_eta": 600.0, "weibull_gamma": 0.0, "mttr": 5.0,
             "sigma_t": 2.0, "threshold_override": None,
         })
@@ -51,11 +55,13 @@ else:
     byid = {str(r["ativo_id"]): r for r in old.to_dict("records")}
     rows = []
     for aid in top_ids:
-        rows.append(byid.get(aid, {
-            "ativo_id": aid, "nome": nomes.get(aid, aid), "weibull_beta": 1.5,
-            "weibull_eta": 600.0, "weibull_gamma": 0.0, "mttr": 5.0,
-            "sigma_t": 2.0, "threshold_override": None,
+        row = dict(byid.get(aid, {
+            "ativo_id": aid, "nome": nomes.get(aid, aid), "idade_atual": 0.0,
+            "weibull_beta": 1.5, "weibull_eta": 600.0, "weibull_gamma": 0.0,
+            "mttr": 5.0, "sigma_t": 2.0, "threshold_override": None,
         }))
+        row.setdefault("idade_atual", 0.0)
+        rows.append(row)
     st.session_state.parametros_bruss_df = pd.DataFrame(rows)
 params_df = st.data_editor(st.session_state.parametros_bruss_df, use_container_width=True)
 st.session_state.parametros_bruss_df = params_df
