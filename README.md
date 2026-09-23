@@ -141,3 +141,46 @@ app/
 - Bruss — odds theorem.
 - Thomas, Levrat & Iung — seleção temporal de oportunidades por mantenabilidade × confiabilidade.
 - Lust, Roux & Riane — selective maintenance com maximização de confiabilidade sob janela limitada.
+
+
+## Turnaround scheduling — RCPSP/MRCPSP + escopo condicional
+
+A página \`10_Turnaround_MRCPSP.py\` adiciona uma camada operacional para analisar cronogramas exportados do Microsoft Project em XML.
+
+Fluxo:
+
+\`\`\`text
+Microsoft Project XML
+        ↓
+tarefas + precedências + recursos
+        ↓
+escopo potencial (JSON)
+        ↓
+mandatory / optional / conditional
+        ↓
+eventos de inspeção + AND/OR/XOR
+        ↓
+MRCPSP (modos de execução)
+        ↓
+SSGS com restrições de recursos
+        ↓
+rescheduling do trabalho ainda não iniciado
+\`\`\`
+
+O XML continua sendo o planejamento-base. As regras que o Microsoft Project não representa nativamente ficam em um sidecar JSON, incluindo:
+
+- atividades opcionais;
+- atividades condicionais disparadas por eventos;
+- múltiplos achados simultâneos de inspeção;
+- grupos lógicos AND, OR e XOR;
+- modos alternativos de execução;
+- deadline e ajustes de capacidade.
+
+Atividades já iniciadas ou concluídas são congeladas durante o rescheduling. Relações de precedência com atividades inativas deixam de restringir o cronograma ativo.
+
+Arquivos de demonstração:
+
+- \`data/turnaround_conditional_model.xml\`
+- \`data/turnaround_conditional_scope.json\`
+
+O solver atual combina seleção de modos com SSGS heurístico. Para espaços pequenos de modos, enumera as combinações; para espaços maiores, usa multi-start + busca local. Portanto, o resultado não deve ser interpretado como prova de ótimo global para instâncias grandes.
