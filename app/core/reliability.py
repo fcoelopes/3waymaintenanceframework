@@ -1,7 +1,12 @@
 """Confiabilidade e mantenabilidade usadas pelo framework integrado.
 
-A camada Bruss usa p_i = M(d_i) * R(a_i).  A camada Selective Maintenance
-reutiliza a mesma modelagem de duração por MTTR + sigma_T, agora por ação.
+A camada Bruss usa:
+
+    p_i = M(d_i) * S_RUL(t_i | idade_atual)
+
+onde S_RUL é a sobrevivência residual condicional. A camada Selective
+Maintenance reutiliza a mesma modelagem de duração por MTTR + sigma_T,
+agora por ação.
 """
 from typing import Literal
 
@@ -96,6 +101,39 @@ def reliability_weibull(
     return _return_scalar_if_scalar(out, instante)
 
 
+def survival_rul_weibull(
+    horizonte: float | np.ndarray,
+    idade_atual: float,
+    beta: float,
+    eta: float,
+    gamma: float = 0.0,
+) -> float | np.ndarray:
+    """Sobrevivência da RUL: P(T > idade+h | T > idade).
+
+    Para h >= 0:
+        S_RUL(h | a) = R(a+h) / R(a)
+
+    Isso evita tratar o instante futuro da parada como se fosse a idade absoluta
+    de um componente recém-instalado.
+    """
+    if idade_atual < 0:
+        raise ValueError("idade_atual deve ser >= 0")
+    h = np.asarray(horizonte, dtype=float)
+    if np.any(h < 0):
+        raise ValueError("horizonte deve ser >= 0")
+
+    r_atual = float(reliability_weibull(idade_atual, beta, eta, gamma))
+    if r_atual <= 0.0:
+        out = np.zeros_like(h, dtype=float)
+    else:
+        r_futuro = np.asarray(
+            reliability_weibull(idade_atual + h, beta, eta, gamma),
+            dtype=float,
+        )
+        out = np.clip(r_futuro / r_atual, 0.0, 1.0)
+    return _return_scalar_if_scalar(out, horizonte)
+
+
 def p_success_combined(
     instante: float,
     duracao: float,
@@ -105,10 +143,20 @@ def p_success_combined(
     mttr: float,
     sigma_t: float | None = None,
     tipo_mantenabilidade: TipoMantenabilidade = "lognormal",
+    *,
+    idade_atual: float = 0.0,
 ) -> float:
-    """Função-sucesso combinada do estágio temporal: p=M(d)*R(t)."""
+    """Função-sucesso combinada: p=M(d)*S_RUL(t | idade_atual)."""
     m = float(maintainability(duracao, mttr, sigma_t, tipo_mantenabilidade))
-    r = float(reliability_weibull(instante, weibull_beta, weibull_eta, weibull_gamma))
+    r = float(
+        survival_rul_weibull(
+            instante,
+            idade_atual,
+            weibull_beta,
+            weibull_eta,
+            weibull_gamma,
+        )
+    )
     return float(np.clip(m * r, 0.0, 1.0))
 
 
