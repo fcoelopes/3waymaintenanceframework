@@ -26,9 +26,15 @@ RBD completo + ações + MTTR/σT por ação
 Selective Maintenance
         ↓
 ativo × parada × ação
+        ↓
+WBS + recursos + precedências
+        ↓
+RCPSP / CP-SAT
+        ↓
+cronograma executável (HOW)
 ```
 
-Os motores permanecem desacoplados. O score PROMETHEE **não** é somado à função objetivo do Selective Maintenance: a primeira camada representa preferência/prioridade; a última representa consequência física/sistêmica da combinação de intervenções.
+Os três motores decisórios permanecem desacoplados. O score PROMETHEE **não** é somado à função objetivo do Selective Maintenance: a primeira camada representa preferência/prioridade; a terceira representa consequência física/sistêmica da combinação de intervenções. O RCPSP é uma camada operacional posterior e responde **como executar** o escopo selecionado.
 
 ## Camada 1 — FUCOM + PROMETHEE II
 
@@ -80,6 +86,30 @@ Solvers disponíveis:
 - Tabu Search;
 - branch-and-bound para instâncias pequenas.
 
+
+## Camada operacional — RCPSP / CP-SAT
+
+Depois do **WHICH → WHEN → WHAT**, o RCPSP responde **HOW**.
+
+O motor `app/core/rcpsp.py` recebe atividades de work packages e suporta:
+
+- precedências;
+- recursos renováveis com capacidade;
+- recursos exclusivos;
+- bloqueios/indisponibilidades de recurso;
+- earliest start e latest finish;
+- janela total `T0`;
+- discretização conservadora de horas decimais;
+- minimização de makespan;
+- diagnóstico básico de inviabilidade.
+
+A integração com o Selective possui um adaptador que gera um rascunho inicial,
+mas a ação de manutenção deve ser decomposta em WBS real antes de o cronograma
+ser considerado operacional.
+
+A página `10 · RCPSP` inclui um caso de turnaround editável e visualização em
+Gantt. A formulação e o contrato estão documentados em `docs/RCPSP.md`.
+
 ## Integração / fallback
 
 Se o Bruss indicar uma parada para um ativo, mas o Selective Maintenance não selecionar nenhuma ação nesse ativo porque a janela está congestionada, a interface mostra a **próxima oportunidade ranqueada pelo Bruss**.
@@ -108,7 +138,7 @@ uv run streamlit run app/Inicio.py
 pytest -q
 ```
 
-A suíte cobre FUCOM, PROMETHEE, confiabilidade/mantenabilidade, Bruss e Selective Maintenance. O caso elementar de Lust, Roux & Riane permanece como teste de regressão **no modo determinístico**, reproduzindo `R_sys ≈ 0.874198` para `L=40` e `T0=6 h`.
+A suíte cobre FUCOM, PROMETHEE, confiabilidade/mantenabilidade, Bruss, Selective Maintenance e RCPSP. O caso elementar de Lust, Roux & Riane permanece como teste de regressão **no modo determinístico**, reproduzindo `R_sys ≈ 0.874198` para `L=40` e `T0=6 h`.
 
 ## Estrutura principal
 
@@ -123,7 +153,10 @@ app/
 │   ├── bruss_xr.py
 │   ├── framework.py
 │   ├── rbd.py
-│   └── selective_maintenance.py
+│   ├── selective_maintenance.py
+│   ├── rcpsp.py
+│   └── rcpsp_adapter.py
+├── rcpsp_models.py
 └── pages/
     ├── 1_Criterios_FUCOM.py
     ├── 2_Ativos.py
@@ -131,7 +164,8 @@ app/
     ├── 5_Paradas_e_Parametros.py
     ├── 6_Bruss_XR.py
     ├── 8_Decisao_Integrada.py
-    └── 9_Selective_Maintenance.py
+    ├── 9_Selective_Maintenance.py
+    └── 10_RCPSP_Scheduler.py
 ```
 
 ## Referências-base do projeto

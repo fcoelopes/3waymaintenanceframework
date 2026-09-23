@@ -82,6 +82,26 @@ max R_sys
 O motor rejeita um RBD que omita algum componente declarado como pertencente ao
 sistema.
 
+## Camada operacional posterior — HOW / RCPSP
+
+Depois que o Selective define o portfólio de ações, cada ação selecionada deve
+ser decomposta em work packages e atividades. O RCPSP recebe:
+
+- duração das atividades;
+- precedências;
+- recursos renováveis e suas capacidades;
+- recursos exclusivos;
+- indisponibilidades de recurso;
+- earliest start / latest finish;
+- janela total `T0`.
+
+O scheduler usa OR-Tools CP-SAT para minimizar o makespan respeitando essas
+restrições. Portanto, o Selective responde **WHAT** e o RCPSP responde **HOW**.
+
+Se o RCPSP provar que o escopo é inviável, o resultado fornece diagnóstico para
+revisão do escopo. A devolução automática de um *cut* ao Selective é evolução
+futura.
+
 ## Fallback temporal
 
 Se um ativo candidato não recebe ação (`none`) porque o portfólio ótimo usa a
@@ -109,5 +129,6 @@ próxima oportunidade ranqueada no resultado Bruss.
   oportunidades sucessivas; não se reivindica optimalidade universal fora dessas
   hipóteses;
 - RBD limitado a estruturas decomponíveis série/paralelo;
-- sem common cause, múltiplas equipes, precedências, custos ou otimização
-  multiobjetivo no MVP.
+- sem common cause e sem custos/otimização multiobjetivo na decisão Selective;
+- múltiplas equipes, precedências e recursos passam a ser tratados na camada RCPSP;
+- multi-skill, multi-mode e realimentação automática RCPSP → Selective ainda estão fora do MVP.
