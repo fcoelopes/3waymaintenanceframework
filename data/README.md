@@ -40,3 +40,18 @@ Estrutura:
 
 As durações exatas de cada parada estão na **Tabela 1 do artigo** (coluna 'duration').
 Os instantes são regulares de 30 em 30h conforme afirmado em §3.1 do artigo.
+
+
+### `turnaround_project_model.xml`
+Modelo de cronograma em **Microsoft Project XML (MSPDI)** para testes do motor de turnaround/RCPSP/MRCPSP.
+
+O exemplo inclui:
+- EDT/WBS e tarefas-resumo;
+- atividades executáveis e milestone final;
+- relações Finish-to-Start (FS) e Start-to-Start (SS) com lag;
+- calendário de turnaround 24x7;
+- pools de recursos: Operação, Mecânica, Elétrica, Instrumentação, Inspeção, Guindaste e Andaime;
+- assignments com unidades de recurso;
+- duas frentes concorrentes que disputam recursos.
+
+Use o arquivo como referência para exportar cronogramas reais do Microsoft Project. Os modos alternativos do MRCPSP continuam sendo definidos na aplicação; o XML representa o planejamento-base.
