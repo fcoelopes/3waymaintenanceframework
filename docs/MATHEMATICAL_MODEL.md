@@ -139,3 +139,54 @@ próxima oportunidade ranqueada.
   do modelo, não como prova de optimalidade universal.
 
 Essas hipóteses devem ser explicitadas em qualquer artigo ou experimento.
+
+
+---
+
+## 7. Camada operacional HOW — RCPSP
+
+O RCPSP não substitui nenhuma das três decisões do 3Way. Ele recebe o escopo
+selecionado e testa/programa sua execução detalhada.
+
+Para cada atividade `j`:
+
+```text
+e_j = s_j + d_j
+```
+
+Para cada precedência `i -> j`:
+
+```text
+s_j >= e_i
+```
+
+Para cada recurso renovável `r`, com capacidade `Q_r`:
+
+```text
+sum(q_jr para j ativo em t) <= Q_r, para todo t
+```
+
+Recursos indivisíveis usam uma restrição de não sobreposição. Bloqueios de
+recurso são intervalos fixos que consomem capacidade.
+
+A janela da parada impõe:
+
+```text
+Cmax = max(e_j) <= T0
+```
+
+e o objetivo do MVP é:
+
+```text
+min Cmax
+```
+
+A chance constraint do Selective continua funcionando como pré-filtro de
+portfólio. A viabilidade temporal detalhada passa a ser verificada pelo RCPSP
+após a decomposição das ações em work packages e atividades.
+
+### Estado atual da realimentação
+
+O RCPSP já retorna status de inviabilidade e diagnósticos de caminho crítico e
+carga agregada de recursos. A geração automática de cortes para reotimizar o
+Selective ainda não faz parte do MVP.
