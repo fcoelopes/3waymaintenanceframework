@@ -1,0 +1,136 @@
+{
+  "janela_h": 24.0,
+  "time_unit_minutes": 15,
+  "max_solve_seconds": 30.0,
+  "num_workers": 8,
+  "random_seed": 42,
+  "recursos": [
+    {"id": "MEC", "nome": "Mecânicos", "capacidade": 3, "exclusivo": false},
+    {"id": "ELE", "nome": "Eletricistas", "capacidade": 2, "exclusivo": false},
+    {"id": "INSP", "nome": "Inspetor", "capacidade": 1, "exclusivo": false},
+    {"id": "G150", "nome": "Guindaste 150 t", "capacidade": 1, "exclusivo": true}
+  ],
+  "bloqueios_recursos": [
+    {
+      "recurso_id": "G150",
+      "inicio_h": 4.0,
+      "fim_h": 6.0,
+      "reducao_capacidade": 1,
+      "motivo": "Guindaste reservado para içamento crítico de outra frente"
+    }
+  ],
+  "atividades": [
+    {
+      "id": "P101_LOTO",
+      "nome": "P-101 · Isolamento e LOTO",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 1.0,
+      "predecessores": [],
+      "recursos": [
+        {"recurso_id": "MEC", "quantidade": 1},
+        {"recurso_id": "ELE", "quantidade": 1}
+      ]
+    },
+    {
+      "id": "P101_DESAC",
+      "nome": "P-101 · Desacoplamento",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 2.0,
+      "predecessores": ["P101_LOTO"],
+      "recursos": [{"recurso_id": "MEC", "quantidade": 2}]
+    },
+    {
+      "id": "P101_REMOVE",
+      "nome": "P-101 · Içamento e remoção",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 2.0,
+      "predecessores": ["P101_DESAC"],
+      "recursos": [
+        {"recurso_id": "MEC", "quantidade": 2},
+        {"recurso_id": "G150", "quantidade": 1}
+      ]
+    },
+    {
+      "id": "P101_INSTALL",
+      "nome": "P-101 · Instalação da reserva",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 3.0,
+      "predecessores": ["P101_REMOVE"],
+      "recursos": [
+        {"recurso_id": "MEC", "quantidade": 2},
+        {"recurso_id": "G150", "quantidade": 1}
+      ]
+    },
+    {
+      "id": "P101_ALIGN",
+      "nome": "P-101 · Alinhamento",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 2.0,
+      "predecessores": ["P101_INSTALL"],
+      "recursos": [{"recurso_id": "MEC", "quantidade": 2}]
+    },
+    {
+      "id": "P101_ELEC",
+      "nome": "P-101 · Reconexão elétrica",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 1.0,
+      "predecessores": ["P101_ALIGN"],
+      "recursos": [{"recurso_id": "ELE", "quantidade": 1}]
+    },
+    {
+      "id": "P101_TEST",
+      "nome": "P-101 · Teste funcional",
+      "work_package_id": "WP-P101",
+      "ativo_id": "P-101",
+      "acao_origem": "replace",
+      "duracao_h": 1.0,
+      "predecessores": ["P101_ELEC"],
+      "recursos": [
+        {"recurso_id": "MEC", "quantidade": 1},
+        {"recurso_id": "INSP", "quantidade": 1}
+      ]
+    },
+    {
+      "id": "E201_OPEN",
+      "nome": "E-201 · Abertura",
+      "work_package_id": "WP-E201",
+      "ativo_id": "E-201",
+      "acao_origem": "minimal_repair",
+      "duracao_h": 2.0,
+      "predecessores": [],
+      "recursos": [{"recurso_id": "MEC", "quantidade": 2}]
+    },
+    {
+      "id": "E201_INSP",
+      "nome": "E-201 · Inspeção interna",
+      "work_package_id": "WP-E201",
+      "ativo_id": "E-201",
+      "acao_origem": "minimal_repair",
+      "duracao_h": 3.0,
+      "predecessores": ["E201_OPEN"],
+      "recursos": [{"recurso_id": "INSP", "quantidade": 1}]
+    },
+    {
+      "id": "E201_CLOSE",
+      "nome": "E-201 · Fechamento",
+      "work_package_id": "WP-E201",
+      "ativo_id": "E-201",
+      "acao_origem": "minimal_repair",
+      "duracao_h": 2.0,
+      "predecessores": ["E201_INSP"],
+      "recursos": [{"recurso_id": "MEC", "quantidade": 2}]
+    }
+  ]
+}

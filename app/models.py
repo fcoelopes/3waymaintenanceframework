@@ -2,8 +2,8 @@
 
 Fluxo:
 1) FUCOM + PROMETHEE II -> quais ativos;
-2) Bruss X·R -> quando intervir;
-3) RBD + Selective Maintenance estocástica -> o que fazer na janela.
+2) Bruss X·RUL condicional -> quando intervir;
+3) RBD completo + Selective Maintenance estocástica -> o que fazer na janela.
 """
 from typing import Literal
 
@@ -88,6 +88,7 @@ class AgendaParadasPlanta(BaseModel):
 
 class ParametrosAtivoBruss(BaseModel):
     ativo_id: str
+    idade_atual: float = Field(default=0.0, ge=0)
     weibull_beta: float = Field(gt=0)
     weibull_eta: float = Field(gt=0)
     weibull_gamma: float = Field(ge=0, default=0.0)
@@ -172,6 +173,7 @@ class NoRBD(BaseModel):
 class ComponenteSelective(BaseModel):
     """Parâmetros físicos e distribuições de duração por ativo x ação.
 
+    idade representa a idade do componente no início da janela de manutenção.
     Os campos tempo_* representam a média observada/estimada (MTTR da ação).
     sigma_* representa a dispersão em horas. Se omitido, o motor usa 0.4*MTTR.
     """

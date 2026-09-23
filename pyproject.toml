@@ -1,7 +1,7 @@
 [project]
 name = "promethee-app"
 version = "0.1.0"
-description = "Framework de apoio à decisão em manutenção: PROMETHEE/FUCOM + Bruss X·R + Selective Maintenance estocástica"
+description = "Framework de apoio à decisão em manutenção: FUCOM/PROMETHEE + Bruss X·RUL + Selective Maintenance + RCPSP"
 authors = [{name = "Edson F. Coelho Lopes"}]
 requires-python = ">=3.11"
 dependencies = [
@@ -12,6 +12,7 @@ dependencies = [
     "plotly>=5.18",
     "pydantic>=2.5",
     "openpyxl>=3.1",
+    "ortools>=9.15.6755,<9.16",
 ]
 
 [project.optional-dependencies]
