@@ -122,16 +122,13 @@ def survival_rul_weibull(
     if np.any(h < 0):
         raise ValueError("horizonte deve ser >= 0")
 
-    r_atual = float(reliability_weibull(idade_atual, beta, eta, gamma))
-    if r_atual <= 0.0:
-        out = np.zeros_like(h, dtype=float)
-    else:
-        r_futuro = np.asarray(
-            reliability_weibull(idade_atual + h, beta, eta, gamma),
-            dtype=float,
-        )
-        out = np.clip(r_futuro / r_atual, 0.0, 1.0)
-    return _return_scalar_if_scalar(out, horizonte)
+    # Forma algébrica equivalente a R(a+h)/R(a), mas numericamente estável
+    # mesmo quando R(a) já sofreu underflow para zero.
+    inicio = max(0.0, idade_atual - gamma)
+    fim = np.maximum(0.0, idade_atual + h - gamma)
+    expoente = -((fim / eta) ** beta - (inicio / eta) ** beta)
+    out = np.exp(expoente)
+    return _return_scalar_if_scalar(np.clip(out, 0.0, 1.0), horizonte)
 
 
 def p_success_combined(
