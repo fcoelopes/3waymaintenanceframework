@@ -236,3 +236,37 @@ def test_scope_config_can_turn_xml_task_into_conditional_without_mutating_base()
     })
     assert base.tasks[1].activation.kind == "mandatory"
     assert configured.tasks[1].activation.kind == "conditional"
+
+
+
+def test_demo_resource_scenario_changes_mode_and_makespan():
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    base = load_project_xml(root / "data" / "turnaround_conditional_model.xml")
+    base = apply_scope_config(base, root / "data" / "turnaround_conditional_scope.json")
+
+    state = ExecutionState(
+        current_time=7,
+        events={"4": ["bearing_damage"]},
+        executions={
+            "1": TaskExecution(status="completed", start=0, finish=1, mode_name="base"),
+            "2": TaskExecution(status="completed", start=1, finish=3, mode_name="base"),
+            "3": TaskExecution(status="completed", start=3, finish=5, mode_name="base"),
+            "4": TaskExecution(status="completed", start=5, finish=7, mode_name="base"),
+        },
+    )
+
+    base_result = reschedule_from_state(base, state)
+    base_bearing = next(x for x in base_result.schedule.tasks if x.task_id == "5")
+    assert base.capacities["Mecânica"] == 4
+    assert base_bearing.mode_name == "normal"
+    assert base_result.schedule.makespan == pytest.approx(17)
+
+    scenario = base.model_copy(
+        update={"capacities": {**base.capacities, "Mecânica": 5}}
+    )
+    scenario_result = reschedule_from_state(scenario, state)
+    scenario_bearing = next(x for x in scenario_result.schedule.tasks if x.task_id == "5")
+    assert scenario_bearing.mode_name == "reforco"
+    assert scenario_result.schedule.makespan == pytest.approx(15)
