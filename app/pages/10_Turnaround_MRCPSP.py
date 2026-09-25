@@ -211,14 +211,18 @@ st.markdown(
 )
 
 scenario_name = st.text_input("Nome do cenário", value="Cenário de recursos A")
+if use_demo:
+    st.info(
+        "Teste guiado: com o achado bearing_damage ativo, mova Mecânica de 4 para 5. "
+        "O modo de 'Trocar rolamentos P-101' deve mudar de normal (5 h) para reforço (3 h), "
+        "e o makespan do escopo descoberto deve cair de 17 h para 15 h."
+    )
 cols = st.columns(min(4, max(1, len(base_capacities))))
 scenario_capacities: dict[str, float] = {}
 for i, (resource, capacity) in enumerate(sorted(base_capacities.items())):
     upper = max(2.0, capacity * 2.5)
     step = 1.0 if float(capacity).is_integer() else 0.5
     demo_default = float(capacity)
-    if use_demo and resource == "Mecânica":
-        demo_default = min(float(upper), max(float(capacity), 5.0))
     with cols[i % len(cols)]:
         scenario_capacities[resource] = st.slider(
             resource,
